@@ -4,6 +4,7 @@ import java.util.Scanner;
 
 import com.guessapp.exception.InvalidInputException;
 import com.guessapp.model.GameConfig;
+import com.guessapp.repository.StorageService;
 import com.guessapp.service.GuessValidator;
 import com.guessapp.service.HintService;
 import com.guessapp.service.ValidationService;
@@ -11,32 +12,48 @@ import com.guessapp.service.ValidationService;
 /**
  * MAIN CLASS
  *
- * Use Case 4: Error Handling & Validation
+ * Use Case 5: Game Result Storage
  *
- * This class coordinates the game execution while ensuring
- * all user inputs are safely validated before processing.
+ * This class coordinates the complete game flow
+ * and persists the final result after completion.
  *
  * Responsibilities:
  * - Initialize game configuration
- * - Accept user input
- * - Validate input using ValidationService
- * - Handle game flow without crashing on invalid input
+ * - Accept and validate user guesses
+ * - Generate hints when applicable
+ * - Store game result at the end
  *
  * @author Developer
- * @version 4.0
+ * @version 5.0
  */
 public class GuessingApp {
     
      public static void main(String[] args) throws InvalidInputException {
 
+        System.out.println("================================");
         System.out.println("Welcome to the Guessing App");
-        GameConfig gc = new GameConfig();
-        gc.showRules();
+        System.out.println("================================");
 
         Scanner scanner = new Scanner(System.in);
 
+        /**
+         * player name captured once 
+         * and stored along with game result
+         */
+
+        System.out.println("Enter the Player Name : ");
+        String player = scanner.nextLine();
+
+        GameConfig gc = new GameConfig();
+        gc.showRules();
+
+        
+
         int attempts = 0;
         int hints = 0;
+
+        boolean win = false;
+
         /*
         * Game loop runs until the player
         * exhausts the maximum attempts.
@@ -63,9 +80,16 @@ public class GuessingApp {
 
            // Break the loop if the guess is correct
            if(result.equals("CORRECT")){
+               win = true;
                break;
            }
         }
+
+        /**
+         * final game result is persisted
+         * after the game loop completes
+         */
+        StorageService.saveResult(player, attempts, win);
 
      }
 }
